@@ -48,32 +48,32 @@ export const PageThumbnailsDrawer: React.FC<PageThumbnailsDrawerProps> = ({
   return (
     <div className="fixed inset-y-0 left-0 z-40 w-full sm:w-96 apple-glass border-r border-white/10 text-slate-100 shadow-2xl flex flex-col animate-in slide-in-from-left duration-300">
       {/* Drawer Header */}
-      <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/20">
+      <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/40">
         <div>
           <h2 className="text-base font-bold text-white flex items-center gap-2">
-            <Grid className="w-4 h-4 text-amber-500" />
+            <Grid className="w-4 h-4 text-white" />
             <span>Nawigacja Katalogu</span>
           </h2>
-          <p className="text-xs text-slate-400 truncate max-w-[220px]">
+          <p className="text-xs text-neutral-400 truncate max-w-[220px]">
             {catalog.title} ({catalog.totalPages} stron)
           </p>
         </div>
         <button
           onClick={onClose}
-          className="apple-press-effect p-2 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all border border-white/10"
+          className="apple-press-effect p-2 rounded-2xl bg-white/5 hover:bg-white/10 text-neutral-400 hover:text-white transition-all border border-white/10"
         >
           <X className="w-5 h-5" />
         </button>
       </div>
 
       {/* Tabs */}
-      <div className="grid grid-cols-4 p-2 bg-black/20 border-b border-white/10 text-xs font-semibold gap-1">
+      <div className="grid grid-cols-4 p-2 bg-black/40 border-b border-white/10 text-xs font-semibold gap-1">
         <button
           onClick={() => setActiveTab('thumbnails')}
           className={`apple-press-effect py-2.5 px-1 rounded-xl text-center flex flex-col items-center gap-1 transition-all ${
             activeTab === 'thumbnails'
-              ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20'
-              : 'text-slate-400 hover:text-white hover:bg-white/5'
+              ? 'bg-white text-black font-bold shadow-md'
+              : 'text-neutral-400 hover:text-white hover:bg-white/5'
           }`}
         >
           <Grid className="w-4 h-4" />
@@ -84,8 +84,8 @@ export const PageThumbnailsDrawer: React.FC<PageThumbnailsDrawerProps> = ({
           onClick={() => setActiveTab('search')}
           className={`apple-press-effect py-2.5 px-1 rounded-xl text-center flex flex-col items-center gap-1 transition-all ${
             activeTab === 'search'
-              ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20'
-              : 'text-slate-400 hover:text-white hover:bg-white/5'
+              ? 'bg-white text-black font-bold shadow-md'
+              : 'text-neutral-400 hover:text-white hover:bg-white/5'
           }`}
         >
           <Search className="w-4 h-4" />
@@ -96,8 +96,8 @@ export const PageThumbnailsDrawer: React.FC<PageThumbnailsDrawerProps> = ({
           onClick={() => setActiveTab('bookmarks')}
           className={`apple-press-effect py-2.5 px-1 rounded-xl text-center flex flex-col items-center gap-1 transition-all ${
             activeTab === 'bookmarks'
-              ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20'
-              : 'text-slate-400 hover:text-white hover:bg-white/5'
+              ? 'bg-white text-black font-bold shadow-md'
+              : 'text-neutral-400 hover:text-white hover:bg-white/5'
           }`}
         >
           <BookmarkIcon className="w-4 h-4" />
@@ -108,8 +108,8 @@ export const PageThumbnailsDrawer: React.FC<PageThumbnailsDrawerProps> = ({
           onClick={() => setActiveTab('hotspots')}
           className={`apple-press-effect py-2.5 px-1 rounded-xl text-center flex flex-col items-center gap-1 transition-all ${
             activeTab === 'hotspots'
-              ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20'
-              : 'text-slate-400 hover:text-white hover:bg-white/5'
+              ? 'bg-white text-black font-bold shadow-md'
+              : 'text-neutral-400 hover:text-white hover:bg-white/5'
           }`}
         >
           <Tag className="w-4 h-4" />
@@ -136,11 +136,11 @@ export const PageThumbnailsDrawer: React.FC<PageThumbnailsDrawerProps> = ({
                   }}
                   className={`group relative rounded-xl overflow-hidden cursor-pointer border-2 transition-all p-1.5 ${
                     isCurrent
-                      ? 'border-amber-500 bg-amber-500/10 shadow-lg scale-[1.02]'
-                      : 'border-slate-800 hover:border-slate-600 bg-slate-950/60'
+                      ? 'border-white bg-white/10 shadow-lg scale-[1.02]'
+                      : 'border-neutral-800 hover:border-neutral-600 bg-black/60'
                   }`}
                 >
-                  <div className="relative aspect-[1/1.4] rounded-lg overflow-hidden bg-slate-950">
+                  <div className="relative aspect-[1/1.4] rounded-lg overflow-hidden bg-black">
                     <img
                       src={page.dataUrl}
                       alt={`Strona ${page.pageNumber}`}
@@ -148,16 +148,16 @@ export const PageThumbnailsDrawer: React.FC<PageThumbnailsDrawerProps> = ({
                     />
                     
                     {/* Page Badges */}
-                    <div className="absolute top-1 left-1 bg-slate-950/80 backdrop-blur-sm text-slate-200 text-[10px] font-bold px-1.5 py-0.5 rounded">
+                    <div className="absolute top-1 left-1 bg-black/80 backdrop-blur-sm text-neutral-200 text-[10px] font-bold px-1.5 py-0.5 rounded border border-white/10">
                       Str. {page.pageNumber}
                     </div>
 
                     <div className="absolute top-1 right-1 flex gap-1">
                       {hasBookmark && (
-                        <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-sm" title="Strona z zakładką" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-white shadow-sm" title="Strona z zakładką" />
                       )}
                       {hasHotspot && (
-                        <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-sm" title="Strona z interaktywnym punktem" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-neutral-400 shadow-sm" title="Strona z interaktywnym punktem" />
                       )}
                     </div>
                   </div>
@@ -171,18 +171,18 @@ export const PageThumbnailsDrawer: React.FC<PageThumbnailsDrawerProps> = ({
         {activeTab === 'search' && (
           <div className="space-y-4">
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+              <Search className="w-4 h-4 absolute left-3 top-3 text-neutral-400" />
               <input
                 type="text"
                 placeholder="Wpisz nazwę produktu, cenę..."
                 value={searchQuery}
                 onChange={handleSearch}
-                className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-amber-500 transition-all"
+                className="w-full pl-9 pr-4 py-2.5 bg-black border border-neutral-800 rounded-xl text-sm text-white focus:outline-none focus:border-white transition-all"
               />
             </div>
 
             {searchQuery && searchResults.length === 0 && (
-              <div className="text-center py-8 text-slate-400 text-sm">
+              <div className="text-center py-8 text-neutral-400 text-sm">
                 Brak wyników wyszukiwania dla &quot;{searchQuery}&quot;.
               </div>
             )}
@@ -195,13 +195,13 @@ export const PageThumbnailsDrawer: React.FC<PageThumbnailsDrawerProps> = ({
                     onSelectPage(res.pageNumber);
                     onClose();
                   }}
-                  className="p-3 bg-slate-950/60 hover:bg-slate-800/60 rounded-xl border border-slate-800/80 cursor-pointer transition-all"
+                  className="p-3 bg-neutral-900/80 hover:bg-neutral-800/80 rounded-xl border border-neutral-800 cursor-pointer transition-all"
                 >
-                  <div className="flex items-center justify-between text-xs font-bold text-amber-400 mb-1">
+                  <div className="flex items-center justify-between text-xs font-bold text-white mb-1">
                     <span>Strona {res.pageNumber}</span>
-                    <span className="text-[10px] text-slate-500">Przejdź &rarr;</span>
+                    <span className="text-[10px] text-neutral-500">Przejdź &rarr;</span>
                   </div>
-                  <p className="text-xs text-slate-300 leading-relaxed font-mono">
+                  <p className="text-xs text-neutral-300 leading-relaxed font-mono">
                     {res.textSnippet}
                   </p>
                 </div>
@@ -214,14 +214,14 @@ export const PageThumbnailsDrawer: React.FC<PageThumbnailsDrawerProps> = ({
         {activeTab === 'bookmarks' && (
           <div className="space-y-2">
             {catalog.bookmarks.length === 0 ? (
-              <div className="text-center py-10 text-slate-400 text-sm">
+              <div className="text-center py-10 text-neutral-400 text-sm">
                 Brak zapisanych zakładek. Kliknij ikony zakładki na dolnym pasku, aby oznaczyć ważne strony.
               </div>
             ) : (
               catalog.bookmarks.map((bm) => (
                 <div
                   key={bm.pageNumber}
-                  className="p-3 bg-slate-950/60 rounded-xl border border-slate-800 flex items-center justify-between gap-2"
+                  className="p-3 bg-neutral-900/80 rounded-xl border border-neutral-800 flex items-center justify-between gap-2"
                 >
                   <div
                     onClick={() => {
@@ -231,14 +231,14 @@ export const PageThumbnailsDrawer: React.FC<PageThumbnailsDrawerProps> = ({
                     className="flex-1 cursor-pointer"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-white" />
                       <span className="text-sm font-bold text-white">Strona {bm.pageNumber}</span>
                     </div>
-                    <p className="text-xs text-slate-400 mt-1">{bm.label}</p>
+                    <p className="text-xs text-neutral-400 mt-1">{bm.label}</p>
                   </div>
                   <button
                     onClick={() => onRemoveBookmark(bm.pageNumber)}
-                    className="p-2 rounded-lg bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-all"
+                    className="p-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-white transition-all"
                     title="Usuń zakładkę"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -253,14 +253,14 @@ export const PageThumbnailsDrawer: React.FC<PageThumbnailsDrawerProps> = ({
         {activeTab === 'hotspots' && (
           <div className="space-y-2">
             {catalog.hotspots.length === 0 ? (
-              <div className="text-center py-10 text-slate-400 text-sm">
+              <div className="text-center py-10 text-neutral-400 text-sm">
                 Brak interaktywnych punktów produktów. Dodaj je za pomocą przycisku &quot;+&quot; na dolnym pasku!
               </div>
             ) : (
               catalog.hotspots.map((hs) => (
                 <div
                   key={hs.id}
-                  className="p-3 bg-slate-950/60 rounded-xl border border-slate-800 flex items-start justify-between gap-2"
+                  className="p-3 bg-neutral-900/80 rounded-xl border border-neutral-800 flex items-start justify-between gap-2"
                 >
                   <div
                     onClick={() => {
@@ -270,25 +270,25 @@ export const PageThumbnailsDrawer: React.FC<PageThumbnailsDrawerProps> = ({
                     className="flex-1 cursor-pointer"
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 text-[10px] font-bold">
+                      <span className="px-1.5 py-0.5 rounded bg-neutral-800 text-white border border-neutral-700 text-[10px] font-bold">
                         Str. {hs.pageNumber}
                       </span>
                       {hs.tag && (
-                        <span className="px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 text-[10px] font-bold">
+                        <span className="px-1.5 py-0.5 rounded bg-white text-black text-[10px] font-bold">
                           {hs.tag}
                         </span>
                       )}
                       <span className="text-sm font-bold text-white truncate">{hs.title}</span>
                     </div>
-                    {hs.price && <div className="text-xs font-bold text-emerald-400">{hs.price}</div>}
-                    {hs.description && <p className="text-xs text-slate-400 mt-1 line-clamp-2">{hs.description}</p>}
+                    {hs.price && <div className="text-xs font-bold text-white">{hs.price}</div>}
+                    {hs.description && <p className="text-xs text-neutral-400 mt-1 line-clamp-2">{hs.description}</p>}
                     {hs.url && (
                       <a
                         href={hs.url}
                         target="_blank"
                         rel="noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="inline-flex items-center gap-1 text-[11px] text-amber-400 hover:underline mt-1"
+                        className="inline-flex items-center gap-1 text-[11px] text-neutral-300 hover:text-white hover:underline mt-1"
                       >
                         <span>Otwórz link zewnętrzny</span>
                         <ExternalLink className="w-3 h-3" />
@@ -297,7 +297,7 @@ export const PageThumbnailsDrawer: React.FC<PageThumbnailsDrawerProps> = ({
                   </div>
                   <button
                     onClick={() => onRemoveHotspot(hs.id)}
-                    className="p-2 rounded-lg bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-all"
+                    className="p-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-white transition-all"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

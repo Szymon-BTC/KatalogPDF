@@ -104,21 +104,21 @@ export const AiCatalogAssistant: React.FC<AiCatalogAssistantProps> = ({
   ];
 
   return (
-    <div className="fixed inset-y-0 right-0 z-40 w-full sm:w-96 apple-glass border-l border-white/10 text-slate-100 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+    <div className="fixed inset-y-0 right-0 z-40 w-full sm:w-96 apple-glass border-l border-white/10 text-neutral-100 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
       {/* Header */}
-      <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/20">
+      <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/40">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-indigo-600/90 text-white shadow-lg shadow-indigo-600/30 border border-indigo-400/30">
-            <Sparkles className="w-5 h-5 text-amber-300" />
+          <div className="p-2.5 rounded-2xl bg-white text-black font-bold shadow-md border border-white/20">
+            <Sparkles className="w-5 h-5 text-black" />
           </div>
           <div>
             <h2 className="text-base font-bold text-white tracking-tight">AI Asystent Katalogu</h2>
-            <p className="text-xs text-indigo-300 font-semibold">Powered by Gemini AI</p>
+            <p className="text-xs text-neutral-400 font-semibold">Powered by Gemini AI</p>
           </div>
         </div>
         <button
           onClick={onClose}
-          className="apple-press-effect p-2 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all border border-white/10"
+          className="apple-press-effect p-2 rounded-2xl bg-white/5 hover:bg-white/10 text-neutral-400 hover:text-white transition-all border border-white/10"
         >
           <X className="w-5 h-5" />
         </button>
@@ -133,7 +133,7 @@ export const AiCatalogAssistant: React.FC<AiCatalogAssistantProps> = ({
           >
             <div
               className={`w-8 h-8 rounded-2xl flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-md ${
-                msg.sender === 'user' ? 'bg-amber-500 text-slate-950' : 'bg-indigo-600 text-white'
+                msg.sender === 'user' ? 'bg-white text-black' : 'bg-neutral-800 text-white border border-neutral-700'
               }`}
             >
               {msg.sender === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
@@ -141,14 +141,14 @@ export const AiCatalogAssistant: React.FC<AiCatalogAssistantProps> = ({
             <div
               className={`max-w-[80%] p-3.5 rounded-3xl text-xs leading-relaxed shadow-lg ${
                 msg.sender === 'user'
-                  ? 'bg-amber-500 text-slate-950 font-semibold rounded-tr-none shadow-amber-500/10'
-                  : 'bg-black/40 border border-white/10 text-slate-100 rounded-tl-none backdrop-blur-md'
+                  ? 'bg-white text-black font-semibold rounded-tr-none'
+                  : 'bg-neutral-900 border border-neutral-800 text-neutral-100 rounded-tl-none backdrop-blur-md'
               }`}
             >
               <p className="whitespace-pre-wrap">{msg.text}</p>
               <div
                 className={`text-[9px] mt-1.5 text-right font-mono ${
-                  msg.sender === 'user' ? 'text-slate-900/70' : 'text-slate-400'
+                  msg.sender === 'user' ? 'text-neutral-600' : 'text-neutral-400'
                 }`}
               >
                 {msg.timestamp}
@@ -159,11 +159,11 @@ export const AiCatalogAssistant: React.FC<AiCatalogAssistantProps> = ({
 
         {isLoading && (
           <div className="flex gap-3">
-            <div className="w-8 h-8 rounded-2xl bg-indigo-600 text-white flex items-center justify-center flex-shrink-0 shadow-md">
+            <div className="w-8 h-8 rounded-2xl bg-neutral-800 text-white border border-neutral-700 flex items-center justify-center flex-shrink-0 shadow-md">
               <Bot className="w-4 h-4" />
             </div>
-            <div className="bg-black/40 border border-white/10 p-3.5 rounded-3xl rounded-tl-none text-xs text-indigo-300 flex items-center gap-2 backdrop-blur-md">
-              <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
+            <div className="bg-neutral-900 border border-neutral-800 p-3.5 rounded-3xl rounded-tl-none text-xs text-neutral-300 flex items-center gap-2 backdrop-blur-md">
+              <Loader2 className="w-4 h-4 animate-spin text-white" />
               <span>Analizuję treść katalogu...</span>
             </div>
           </div>
@@ -171,9 +171,9 @@ export const AiCatalogAssistant: React.FC<AiCatalogAssistantProps> = ({
       </div>
 
       {/* Quick Prompts */}
-      <div className="p-3 bg-black/20 border-t border-white/10 space-y-2">
-        <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
-          <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
+      <div className="p-3 bg-black/40 border-t border-white/10 space-y-2">
+        <div className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 flex items-center gap-1">
+          <HelpCircle className="w-3.5 h-3.5 text-white" />
           <span>Szybkie pytania:</span>
         </div>
         <div className="flex flex-col gap-1.5">
@@ -183,7 +183,7 @@ export const AiCatalogAssistant: React.FC<AiCatalogAssistantProps> = ({
               onClick={() => {
                 setInputPrompt(q);
               }}
-              className="apple-press-effect text-left text-[11px] text-slate-200 hover:text-amber-300 bg-white/5 hover:bg-white/10 px-3 py-2 rounded-xl transition-all truncate border border-white/5"
+              className="apple-press-effect text-left text-[11px] text-neutral-200 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-2 rounded-xl transition-all truncate border border-white/5"
             >
               &bull; {q}
             </button>
@@ -192,18 +192,18 @@ export const AiCatalogAssistant: React.FC<AiCatalogAssistantProps> = ({
       </div>
 
       {/* Input Form */}
-      <form onSubmit={handleSendMessage} className="p-3 bg-black/40 border-t border-white/10 flex gap-2">
+      <form onSubmit={handleSendMessage} className="p-3 bg-black/60 border-t border-white/10 flex gap-2">
         <input
           type="text"
           placeholder="Zadaj pytanie o meble, ceny..."
           value={inputPrompt}
           onChange={(e) => setInputPrompt(e.target.value)}
-          className="flex-1 px-4 py-2.5 bg-black/30 border border-white/10 rounded-2xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400 transition-all"
+          className="flex-1 px-4 py-2.5 bg-black/50 border border-neutral-800 rounded-2xl text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-white transition-all"
         />
         <button
           type="submit"
           disabled={!inputPrompt.trim() || isLoading}
-          className="apple-press-effect p-3 rounded-2xl bg-amber-500 hover:bg-amber-400 disabled:opacity-30 text-slate-950 font-bold transition-all shadow-lg shadow-amber-500/20"
+          className="apple-press-effect p-3 rounded-2xl bg-white hover:bg-neutral-200 disabled:opacity-30 text-black font-bold transition-all shadow-md border border-white"
         >
           <Send className="w-4 h-4" />
         </button>

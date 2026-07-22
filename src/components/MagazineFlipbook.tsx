@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { PageFlip } from 'page-flip';
 import { 
   ChevronLeft, 
@@ -7,10 +8,12 @@ import {
   ShoppingBag, 
   Sparkles,
   Maximize2,
-  BookOpen
+  BookOpen,
+  X
 } from 'lucide-react';
 import { CatalogMetadata, Hotspot, ViewMode, BackgroundTheme } from '../types';
 import { playPageTurnSound } from '../utils/sound';
+import { useModalAccessibility } from '../hooks/useModalAccessibility';
 
 interface MagazineFlipbookProps {
   catalog: CatalogMetadata;
@@ -35,9 +38,18 @@ export const MagazineFlipbook: React.FC<MagazineFlipbookProps> = ({
 }) => {
   const bookRef = useRef<HTMLDivElement>(null);
   const pageFlipRef = useRef<PageFlip | null>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
   const isInternalFlip = useRef<boolean>(false);
   const [selectedHotspot, setSelectedHotspot] = useState<Hotspot | null>(null);
   const totalPages = catalog.totalPages;
+  const shouldReduceMotion = useReducedMotion();
+
+  // Modal accessibility for hotspot popover
+  useModalAccessibility({
+    isOpen: Boolean(selectedHotspot),
+    onClose: () => setSelectedHotspot(null),
+    containerRef: popoverRef,
+  });
 
   // Detect devicePixelRatio for HiDPI / Retina displays
   const dpr = typeof window !== 'undefined' ? Math.max(1, window.devicePixelRatio || 1) : 1;
@@ -62,13 +74,13 @@ export const MagazineFlipbook: React.FC<MagazineFlipbookProps> = ({
         }
 
         const pageFlip = new PageFlip(bookRef.current, {
-          width: 480, // base page width
-          height: 680, // base page height
+          width: 840, // enlarged page width (+75%)
+          height: 1190, // enlarged page height (+75%)
           size: 'stretch',
-          minWidth: 260,
-          maxWidth: Math.round(900 * (dpr > 1.5 ? 1.25 : 1)),
-          minHeight: 380,
-          maxHeight: Math.round(1200 * (dpr > 1.5 ? 1.25 : 1)),
+          minWidth: 420,
+          maxWidth: Math.round(1575 * (dpr > 1.5 ? 1.25 : 1)),
+          minHeight: 600,
+          maxHeight: Math.round(2100 * (dpr > 1.5 ? 1.25 : 1)),
           drawShadow: true,
           maxShadowOpacity: 0.6,
           showCover: true,
@@ -168,20 +180,20 @@ export const MagazineFlipbook: React.FC<MagazineFlipbookProps> = ({
   const getThemeClass = (t: BackgroundTheme) => {
     switch (t) {
       case 'dark-wood':
-        return 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-950 via-slate-950 to-black';
+        return 'bg-black';
       case 'modern-studio':
-        return 'bg-gradient-to-b from-slate-900 via-slate-950 to-zinc-950';
+        return 'bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-neutral-900 via-neutral-950 to-black';
       case 'lux-marble':
-        return 'bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-stone-900 via-zinc-950 to-black';
+        return 'bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-black to-black';
       case 'paper-texture':
-        return 'bg-amber-50/20 bg-gradient-to-br from-amber-100/10 via-slate-900 to-slate-950';
+        return 'bg-gradient-to-b from-neutral-900 to-black';
       case 'minimal-slate':
       default:
-        return 'bg-zinc-950';
+        return 'bg-black';
     }
   };
 
-  // Render Hotspots overlay for a given page number
+  // Render Hotspots overlay for a given page number (Single entrance bounce, no continuous pinging)
   const renderHotspots = (pageNum: number) => {
     const pageHotspots = catalog.hotspots.filter((h) => h.pageNumber === pageNum);
     return pageHotspots.map((h) => (
@@ -190,94 +202,126 @@ export const MagazineFlipbook: React.FC<MagazineFlipbookProps> = ({
         style={{ left: `${h.xPercent}%`, top: `${h.yPercent}%` }}
         className="absolute -translate-x-1/2 -translate-y-1/2 z-20 group"
       >
-        <button
+        <motion.button
+          initial={shouldReduceMotion ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={shouldReduceMotion ? { duration: 0.01 } : { type: 'spring', stiffness: 380, damping: 20 }}
+          whileHover={{ scale: 1.2 }}
+          whileTap={{ scale: 0.9 }}
           onClick={(e) => {
             e.stopPropagation();
             setSelectedHotspot(h);
           }}
-          className="relative flex items-center justify-center w-7 h-7 rounded-full bg-amber-500 text-slate-950 font-bold shadow-lg border-2 border-white hover:scale-125 transition-transform duration-200 animate-bounce"
+          aria-label={`Punkt produktu: ${h.title}`}
+          className="relative flex items-center justify-center w-7 h-7 rounded-full bg-white text-black font-bold shadow-lg border-2 border-neutral-900 cursor-pointer"
         >
           <ShoppingBag className="w-3.5 h-3.5" />
-          <span className="absolute -inset-1 rounded-full bg-amber-400/40 animate-ping -z-10" />
-        </button>
+        </motion.button>
 
         {/* Hover Tooltip Preview */}
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-30 w-48 p-2.5 rounded-xl bg-slate-900/95 border border-amber-500/40 text-slate-100 shadow-2xl backdrop-blur-md text-xs pointer-events-none animate-in fade-in zoom-in-95 duration-150">
-          <div className="flex items-center gap-1.5 font-bold text-amber-400 mb-0.5">
-            {h.tag && <span className="px-1 py-0.2 rounded bg-amber-500 text-slate-950 text-[9px]">{h.tag}</span>}
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-30 w-48 p-2.5 rounded-xl bg-neutral-900/95 border border-white/20 text-white shadow-2xl backdrop-blur-md text-xs pointer-events-none">
+          <div className="flex items-center gap-1.5 font-bold text-white mb-0.5">
+            {h.tag && <span className="px-1 py-0.2 rounded bg-neutral-800 text-white text-[9px] border border-neutral-700">{h.tag}</span>}
             <span className="truncate">{h.title}</span>
           </div>
-          {h.price && <div className="text-emerald-400 font-bold text-[11px] mb-1">{h.price}</div>}
-          {h.description && <p className="text-[10px] text-slate-300 line-clamp-2">{h.description}</p>}
+          {h.price && <div className="text-white font-bold text-[11px] mb-1">{h.price}</div>}
+          {h.description && <p className="text-[10px] text-neutral-300 line-clamp-2">{h.description}</p>}
         </div>
       </div>
     ));
   };
 
   return (
-    <div className={`relative w-full min-h-[82vh] flex flex-col items-center justify-center p-2 sm:p-6 overflow-hidden select-none transition-colors duration-500 ${getThemeClass(theme)}`}>
+    <div className={`relative w-full min-h-[86vh] flex flex-col items-center justify-center p-2 sm:p-4 overflow-hidden select-none transition-colors duration-500 ${getThemeClass(theme)}`}>
       {/* Hotspot Modal Popover */}
-      {selectedHotspot && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-amber-500/40 rounded-2xl p-6 max-w-sm w-full text-slate-100 shadow-2xl relative">
-            <button
-              onClick={() => setSelectedHotspot(null)}
-              className="absolute top-3 right-3 p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white"
+      <AnimatePresence>
+        {selectedHotspot && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setSelectedHotspot(null);
+            }}
+          >
+            <motion.div
+              ref={popoverRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="hotspot-popover-title"
+              initial={{ opacity: 0, scale: 0.9, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 12 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+              className="bg-neutral-950 border border-white/20 rounded-2xl p-6 max-w-sm w-full text-white shadow-2xl relative"
             >
-              &times;
-            </button>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="p-2 rounded-xl bg-amber-500 text-slate-950 font-bold">
-                <ShoppingBag className="w-5 h-5" />
-              </span>
-              <div>
-                {selectedHotspot.tag && (
-                  <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wide">
-                    {selectedHotspot.tag}
-                  </span>
-                )}
-                <h3 className="text-base font-bold text-white">{selectedHotspot.title}</h3>
-              </div>
-            </div>
-            {selectedHotspot.price && (
-              <div className="text-lg font-bold text-emerald-400 my-2">{selectedHotspot.price}</div>
-            )}
-            {selectedHotspot.description && (
-              <p className="text-xs text-slate-300 leading-relaxed mb-4">{selectedHotspot.description}</p>
-            )}
-            {selectedHotspot.url && (
-              <a
-                href={selectedHotspot.url}
-                target="_blank"
-                rel="noreferrer"
-                className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl flex items-center justify-center gap-2 text-xs shadow-md transition-all"
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setSelectedHotspot(null)}
+                aria-label="Zamknij podgląd punktu produktu"
+                className="absolute top-3 right-3 p-1.5 rounded-lg bg-neutral-800 text-neutral-400 hover:text-white transition-colors"
               >
-                <span>Przejdź do oferty produktu</span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
-            )}
+                <X className="w-4 h-4" />
+              </motion.button>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="p-2 rounded-xl bg-white text-black font-bold">
+                  <ShoppingBag className="w-5 h-5" />
+                </span>
+                <div>
+                  {selectedHotspot.tag && (
+                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wide">
+                      {selectedHotspot.tag}
+                    </span>
+                  )}
+                  <h3 id="hotspot-popover-title" className="text-base font-bold text-white">
+                    {selectedHotspot.title}
+                  </h3>
+                </div>
+              </div>
+              {selectedHotspot.price && (
+                <div className="text-lg font-bold text-white my-2">{selectedHotspot.price}</div>
+              )}
+              {selectedHotspot.description && (
+                <p className="text-xs text-neutral-300 leading-relaxed mb-4">{selectedHotspot.description}</p>
+              )}
+              {selectedHotspot.url && (
+                <a
+                  href={selectedHotspot.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full py-2.5 bg-white hover:bg-neutral-200 text-black font-bold rounded-xl flex items-center justify-center gap-2 text-xs shadow-md transition-all border border-white"
+                >
+                  <span>Przejdź do oferty produktu</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              )}
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
-      {/* Main Flipbook Stage */}
-      <div 
-        style={{ transform: `scale(${zoomLevel})` }}
-        className="relative transition-transform duration-300 w-full max-w-6xl flex items-center justify-center py-4 my-auto"
+      {/* Main Flipbook Stage with Spring Scaling for Zoom */}
+      <motion.div 
+        animate={{ scale: zoomLevel }}
+        transition={{ type: 'spring', stiffness: 280, damping: 26 }}
+        className="relative w-full max-w-[110rem] flex items-center justify-center py-2 my-auto"
       >
         {/* Navigation Arrow Left */}
         {currentPage > 1 && (
-          <button
+          <motion.button
+            whileHover={{ scale: 1.12 }}
+            whileTap={{ scale: 0.92 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             onClick={handlePrev}
-            className="absolute left-2 sm:left-4 z-40 p-3.5 rounded-full bg-slate-900/85 hover:bg-amber-500 text-white hover:text-slate-950 border border-slate-700/80 hover:border-amber-400 shadow-2xl backdrop-blur-md transition-all hover:scale-110 active:scale-95"
-            title="Poprzednia strona (Przekręć kartkę w lewo)"
+            aria-label="Poprzednia strona katalogu"
+            className="absolute left-2 sm:left-4 z-40 p-3.5 rounded-full bg-neutral-900/90 hover:bg-white text-white hover:text-black border border-neutral-700 hover:border-white shadow-2xl backdrop-blur-md transition-colors"
+            title="Poprzednia strona"
           >
             <ChevronLeft className="w-6 h-6" />
-          </button>
+          </motion.button>
         )}
 
-        {/* Realistic PageFlip Container Container */}
-        <div className="relative flex items-center justify-center p-2 sm:p-4 rounded-3xl bg-slate-950/30 border border-slate-800/40 backdrop-blur-md shadow-[0_35px_80px_-15px_rgba(0,0,0,0.8)]">
+        {/* Realistic PageFlip Container */}
+        <div className="relative flex items-center justify-center p-2 sm:p-4 rounded-3xl bg-black/40 border border-neutral-800/80 backdrop-blur-md shadow-[0_35px_80px_-15px_rgba(0,0,0,0.9)]">
           <div 
             ref={bookRef}
             className="relative overflow-hidden cursor-grab active:cursor-grabbing rounded-xl shadow-2xl transition-all"
@@ -286,22 +330,34 @@ export const MagazineFlipbook: React.FC<MagazineFlipbookProps> = ({
               const isCover = page.pageNumber === 1 || page.pageNumber === totalPages;
               const isEven = page.pageNumber % 2 === 0;
 
+              // Lazy loading strategy: Only render heavy image data for pages near the current spread (±2 pages)
+              const isNearCurrent = Math.abs(page.pageNumber - currentPage) <= 2 || page.pageNumber === 1 || page.pageNumber === totalPages;
+
               return (
                 <div
                   key={page.pageNumber}
                   className="flip-page relative w-full h-full bg-white overflow-hidden shadow-md select-none"
                   data-density={isCover ? 'hard' : 'soft'}
                 >
-                  {/* Page Image */}
-                  <img
-                    src={page.dataUrl}
-                    alt={`Strona ${page.pageNumber}`}
-                    className="w-full h-full object-cover pointer-events-none select-none"
-                    style={{
-                      imageRendering: dpr > 1.2 ? '-webkit-optimize-contrast' : 'auto',
-                    }}
-                    draggable={false}
-                  />
+                  {/* Page Image with Lazy Loading & Decoding */}
+                  {isNearCurrent ? (
+                    <img
+                      src={page.dataUrl}
+                      alt={`Strona ${page.pageNumber}`}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover pointer-events-none select-none"
+                      style={{
+                        imageRendering: dpr > 1.2 ? '-webkit-optimize-contrast' : 'auto',
+                      }}
+                      draggable={false}
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-neutral-100 flex flex-col items-center justify-center p-4 text-neutral-400">
+                      <BookOpen className="w-8 h-8 opacity-40 mb-2" />
+                      <span className="text-xs font-bold font-mono">Strona {page.pageNumber}</span>
+                    </div>
+                  )}
 
                   {/* Interactive Hotspots Overlay */}
                   {renderHotspots(page.pageNumber)}
@@ -319,11 +375,11 @@ export const MagazineFlipbook: React.FC<MagazineFlipbookProps> = ({
                   <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
 
                   {/* Page Corner Drag Hint / Visual Curl Accent */}
-                  <div className={`absolute bottom-0 ${isEven ? 'left-0' : 'right-0'} w-8 h-8 pointer-events-none bg-gradient-to-tl from-amber-400/20 to-transparent opacity-60`} />
+                  <div className={`absolute bottom-0 ${isEven ? 'left-0' : 'right-0'} w-8 h-8 pointer-events-none bg-gradient-to-tl from-white/10 to-transparent opacity-60`} />
 
                   {/* Page Number Badge */}
                   <div 
-                    className={`absolute bottom-2 ${isEven ? 'left-3' : 'right-3'} text-[10px] font-semibold text-slate-500 bg-white/80 px-2 py-0.5 rounded shadow-sm border border-slate-200/60 pointer-events-none`}
+                    className={`absolute bottom-2 ${isEven ? 'left-3' : 'right-3'} text-[10px] font-semibold text-neutral-700 bg-white/90 px-2 py-0.5 rounded shadow-sm border border-neutral-300 pointer-events-none`}
                   >
                     {page.pageNumber}
                   </div>
@@ -335,24 +391,28 @@ export const MagazineFlipbook: React.FC<MagazineFlipbookProps> = ({
 
         {/* Navigation Arrow Right */}
         {currentPage < totalPages && (
-          <button
+          <motion.button
+            whileHover={{ scale: 1.12 }}
+            whileTap={{ scale: 0.92 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             onClick={handleNext}
-            className="absolute right-2 sm:right-4 z-40 p-3.5 rounded-full bg-slate-900/85 hover:bg-amber-500 text-white hover:text-slate-950 border border-slate-700/80 hover:border-amber-400 shadow-2xl backdrop-blur-md transition-all hover:scale-110 active:scale-95"
-            title="Następna strona (Przekręć kartkę w prawo)"
+            aria-label="Następna strona katalogu"
+            className="absolute right-2 sm:right-4 z-40 p-3.5 rounded-full bg-neutral-900/90 hover:bg-white text-white hover:text-black border border-neutral-700 hover:border-white shadow-2xl backdrop-blur-md transition-colors"
+            title="Następna strona"
           >
             <ChevronRight className="w-6 h-6" />
-          </button>
+          </motion.button>
         )}
-      </div>
+      </motion.div>
 
       {/* Helper hint for drag gestures & HiDPI indicator */}
-      <div className="mt-2 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs text-slate-400/80 bg-slate-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-slate-800">
+      <div className="mt-2 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs text-neutral-400 bg-neutral-900/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-neutral-800">
         <div className="flex items-center gap-2">
-          <BookOpen className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-          <span>Przeciągnij narożnik strony lub kliknij, aby przekładać papierowe strony</span>
+          <BookOpen className="w-3.5 h-3.5 text-white" />
+          <span>Przeciągnij narożnik strony lub kliknij strzałki, aby przekładać strony</span>
         </div>
         {dpr > 1 && (
-          <span className="text-[10px] font-bold text-amber-400/90 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+          <span className="text-[10px] font-bold text-white bg-white/10 px-2 py-0.5 rounded-full border border-white/20">
             HiDPI {dpr}x
           </span>
         )}
@@ -360,4 +420,5 @@ export const MagazineFlipbook: React.FC<MagazineFlipbookProps> = ({
     </div>
   );
 };
+
 

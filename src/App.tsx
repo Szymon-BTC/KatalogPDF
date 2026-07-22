@@ -10,6 +10,7 @@ import { PdfUploaderModal } from './components/PdfUploaderModal';
 import { AiCatalogAssistant } from './components/AiCatalogAssistant';
 import { HotspotModal } from './components/HotspotModal';
 import { HelpModal } from './components/HelpModal';
+import { ToastContainer, ToastMessage } from './components/ToastContainer';
 import { BookOpen, Upload, Loader2, Grid } from 'lucide-react';
 
 export default function App() {
@@ -20,6 +21,18 @@ export default function App() {
   const [zoomLevel, setZoomLevel] = useState<number>(1.0);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+
+  // Toast System
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  const addToast = useCallback((message: string, type: 'info' | 'success' | 'error' = 'info') => {
+    const id = 'toast-' + Date.now() + '-' + Math.random();
+    setToasts((prev) => [...prev, { id, message, type }]);
+  }, []);
+
+  const removeToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
 
   // Autoplay
   const [isAutoplay, setIsAutoplay] = useState<boolean>(false);
@@ -60,21 +73,23 @@ export default function App() {
         pages,
         hotspots: initialHotspots,
         bookmarks: [
-          { pageNumber: 1, label: 'Okładka Główna', color: '#f59e0b', createdAt: new Date().toLocaleTimeString() }
+          { pageNumber: 1, label: 'Okładka Główna', color: '#ffffff', createdAt: new Date().toLocaleTimeString() }
         ],
         loadedAt: new Date().toISOString(),
       };
 
       setCatalog(newCatalog);
       setCurrentPage(1);
+      addToast(`Wczytano katalog: "${newCatalog.title}" (${pages.length} stron)`, 'success');
     } catch (err: any) {
       console.error('Błąd podczas ładowania PDF:', err);
-      alert('Nie udało się wczytać pliku PDF. Upewnij się, że plik jest nieuszkodzony.');
+      addToast('Nie udało się wczytać pliku PDF. Upewnij się, że plik jest nieuszkodzony.', 'error');
     } finally {
       setIsLoadingPdf(false);
       setIsUploadModalOpen(false);
     }
-  }, []);
+  }, [addToast]);
+
 
   // Load default sample catalog on mount
   useEffect(() => {
@@ -183,7 +198,7 @@ export default function App() {
           {
             pageNumber: currentPage,
             label: `Zakładka Strona ${currentPage}`,
-            color: '#f59e0b',
+            color: '#ffffff',
             createdAt: new Date().toLocaleTimeString(),
           },
         ],
@@ -223,7 +238,7 @@ export default function App() {
   const isCurrentBookmarked = catalog?.bookmarks.some((b) => b.pageNumber === currentPage) || false;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans antialiased overflow-x-hidden select-none">
+    <div className="min-h-screen bg-black text-neutral-100 flex flex-col font-sans antialiased overflow-x-hidden select-none">
       {/* Top Header */}
       <CatalogHeader
         catalog={catalog}
@@ -244,8 +259,8 @@ export default function App() {
       <main className="flex-1 flex flex-col items-center justify-center relative pb-24">
         {isLoadingPdf && !catalog ? (
           <div className="flex flex-col items-center justify-center py-20 space-y-4">
-            <Loader2 className="w-12 h-12 text-amber-500 animate-spin" />
-            <p className="text-sm text-slate-300 font-medium font-mono">{loadingProgressMsg}</p>
+            <Loader2 className="w-12 h-12 text-white animate-spin" />
+            <p className="text-sm text-neutral-300 font-medium font-mono">{loadingProgressMsg}</p>
           </div>
         ) : catalog ? (
           viewMode === 'grid' ? (
@@ -253,12 +268,12 @@ export default function App() {
             <div className="max-w-6xl mx-auto p-6 w-full">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <Grid className="w-5 h-5 text-amber-500" />
+                  <Grid className="w-5 h-5 text-white" />
                   <span>Przegląd Wszystkich Stron ({catalog.totalPages})</span>
                 </h2>
                 <button
                   onClick={() => setViewMode('double')}
-                  className="px-4 py-2 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs"
+                  className="px-4 py-2 bg-white hover:bg-neutral-200 text-black font-bold rounded-xl text-xs border border-white transition-colors"
                 >
                   Powrót do Trybu Magazynu
                 </button>
@@ -271,14 +286,14 @@ export default function App() {
                       setCurrentPage(p.pageNumber);
                       setViewMode('double');
                     }}
-                    className={`group relative rounded-xl overflow-hidden cursor-pointer border-2 transition-all p-2 bg-slate-900 ${
-                      p.pageNumber === currentPage ? 'border-amber-500 shadow-xl scale-105' : 'border-slate-800 hover:border-slate-600'
+                    className={`group relative rounded-xl overflow-hidden cursor-pointer border-2 transition-all p-2 bg-neutral-900 ${
+                      p.pageNumber === currentPage ? 'border-white shadow-xl scale-105' : 'border-neutral-800 hover:border-neutral-600'
                     }`}
                   >
-                    <div className="aspect-[1/1.4] bg-slate-950 rounded-lg overflow-hidden">
+                    <div className="aspect-[1/1.4] bg-black rounded-lg overflow-hidden">
                       <img src={p.dataUrl} alt={`Strona ${p.pageNumber}`} className="w-full h-full object-contain group-hover:scale-105 transition-transform" />
                     </div>
-                    <div className="mt-2 text-center text-xs font-bold text-slate-300">
+                    <div className="mt-2 text-center text-xs font-bold text-neutral-300">
                       Strona {p.pageNumber}
                     </div>
                   </div>
@@ -301,11 +316,11 @@ export default function App() {
         ) : (
           /* Empty State */
           <div className="text-center py-20 px-4">
-            <BookOpen className="w-16 h-16 text-slate-700 mx-auto mb-4" />
+            <BookOpen className="w-16 h-16 text-neutral-700 mx-auto mb-4" />
             <h2 className="text-xl font-bold text-white mb-2">Brak Wczytanego Katalogu</h2>
             <button
               onClick={() => setIsUploadModalOpen(true)}
-              className="mt-4 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-2xl shadow-lg inline-flex items-center gap-2 text-sm"
+              className="mt-4 px-6 py-3 bg-white hover:bg-neutral-200 text-black font-bold rounded-2xl shadow-lg border border-white inline-flex items-center gap-2 text-sm transition-colors"
             >
               <Upload className="w-5 h-5" />
               <span>Wczytaj Plik PDF</span>
@@ -367,6 +382,7 @@ export default function App() {
         onUploadPdfFile={handleUploadFile}
         isLoading={isLoadingPdf}
         loadingProgressMsg={loadingProgressMsg}
+        onError={(msg) => addToast(msg, 'error')}
       />
 
       <AiCatalogAssistant
@@ -387,6 +403,10 @@ export default function App() {
         isOpen={isHelpModalOpen}
         onClose={() => setIsHelpModalOpen(false)}
       />
+
+      {/* Branded Toast Notifications */}
+      <ToastContainer toasts={toasts} onClose={removeToast} />
     </div>
   );
 }
+

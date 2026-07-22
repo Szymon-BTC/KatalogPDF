@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import { 
   BookOpen, 
   Upload, 
@@ -47,19 +48,23 @@ export const CatalogHeader: React.FC<CatalogHeaderProps> = ({
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         {/* Brand / Catalog Title */}
         <div className="flex items-center gap-3 min-w-0">
-          <div className="p-2.5 rounded-2xl bg-gradient-to-tr from-amber-500 via-amber-600 to-amber-700 text-slate-950 shadow-lg shadow-amber-500/20 flex-shrink-0">
+          <div className="p-2.5 rounded-2xl bg-white text-black font-bold shadow-md flex-shrink-0">
             <BookOpen className="w-5 h-5 font-bold" />
           </div>
           <div className="min-w-0">
             <h1 className="text-base sm:text-lg font-bold tracking-tight text-white truncate">
               {catalog ? catalog.title : 'Interaktywny Katalog PDF'}
             </h1>
-            <p className="text-xs text-slate-400 truncate flex items-center gap-2">
+            <p className="text-xs text-neutral-400 truncate flex items-center gap-2">
               <span>{catalog ? `${catalog.totalPages} stron` : 'Brak wczytanego katalogu'}</span>
-              {catalog && (
+              {catalog && catalog.totalPages > 0 && (
                 <>
-                  <span className="w-1 h-1 rounded-full bg-slate-500"></span>
-                  <span className="text-amber-400 font-semibold">Strona {currentPage} z {catalog.totalPages}</span>
+                  <span className="w-1 h-1 rounded-full bg-neutral-600"></span>
+                  <span className="text-neutral-200 font-semibold">Strona {currentPage} z {catalog.totalPages}</span>
+                  <span className="w-1 h-1 rounded-full bg-neutral-600"></span>
+                  <span className="text-white font-bold px-2 py-0.5 rounded-full bg-white/10 text-[11px] border border-white/10">
+                    Postęp: {Math.round((currentPage / catalog.totalPages) * 100)}%
+                  </span>
                 </>
               )}
             </p>
@@ -67,107 +72,144 @@ export const CatalogHeader: React.FC<CatalogHeaderProps> = ({
         </div>
 
         {/* View Mode Switcher */}
-        <div className="hidden md:flex items-center bg-slate-900/80 p-1 rounded-2xl border border-white/10 shadow-inner">
-          <button
+        <div className="hidden md:flex items-center bg-neutral-900/90 p-1 rounded-2xl border border-white/10 shadow-inner">
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.96 }}
             onClick={() => onChangeViewMode('double')}
-            className={`apple-press-effect flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+            aria-label="Przełącz na widok dwustronicowy (Magazyn)"
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
               viewMode === 'double' 
-                ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20' 
-                : 'text-slate-300 hover:text-white hover:bg-white/10'
+                ? 'bg-white text-black font-bold shadow-md' 
+                : 'text-neutral-300 hover:text-white hover:bg-white/10'
             }`}
             title="Widok dwustronicowy (Magazyn)"
           >
             <BookOpen className="w-3.5 h-3.5" />
             <span>Magazyn 2-Strony</span>
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.96 }}
             onClick={() => onChangeViewMode('single')}
-            className={`apple-press-effect flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+            aria-label="Przełącz na widok pojedynczej strony"
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
               viewMode === 'single' 
-                ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20' 
-                : 'text-slate-300 hover:text-white hover:bg-white/10'
+                ? 'bg-white text-black font-bold shadow-md' 
+                : 'text-neutral-300 hover:text-white hover:bg-white/10'
             }`}
             title="Widok pojedynczej strony"
           >
             <BookMarked className="w-3.5 h-3.5" />
             <span>1 Strona</span>
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.96 }}
             onClick={() => onChangeViewMode('grid')}
-            className={`apple-press-effect flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+            aria-label="Przełącz na siatkę wszystkich stron"
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
               viewMode === 'grid' 
-                ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20' 
-                : 'text-slate-300 hover:text-white hover:bg-white/10'
+                ? 'bg-white text-black font-bold shadow-md' 
+                : 'text-neutral-300 hover:text-white hover:bg-white/10'
             }`}
             title="Siatka miniatur stron"
           >
             <Grid className="w-3.5 h-3.5" />
             <span>Siatka Stron</span>
-          </button>
+          </motion.button>
         </div>
 
         {/* Header Action Buttons */}
         <div className="flex items-center gap-2">
           {/* AI Assistant */}
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={onOpenAiAssistant}
-            className="apple-press-effect flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-indigo-600/90 hover:bg-indigo-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/25 border border-indigo-400/30"
+            aria-label="Otwórz Asystenta AI Gemini"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold border border-neutral-700 shadow-md transition-colors"
             title="Zapytaj Asystenta AI Gemini o produkty w katalogu"
           >
-            <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+            <Sparkles className="w-4 h-4 text-white" />
             <span className="hidden sm:inline">AI Asystent</span>
-          </button>
+          </motion.button>
 
           {/* Search */}
-          <button
+          <motion.button
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
             onClick={onOpenSearch}
-            className="apple-press-effect p-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-all border border-white/10"
+            aria-label="Szukaj w katalogu"
+            className="p-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white transition-colors border border-white/10"
             title="Szukaj w katalogu"
           >
             <Search className="w-4 h-4" />
-          </button>
+          </motion.button>
 
           {/* Thumbnails */}
-          <button
+          <motion.button
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
             onClick={onOpenThumbnails}
-            className="apple-press-effect p-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-all border border-white/10"
+            aria-label="Otwórz miniatury stron i zakładki"
+            className="p-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white transition-colors border border-white/10"
             title="Miniatury stron & Zakładki"
           >
             <Grid className="w-4 h-4" />
-          </button>
+          </motion.button>
 
           {/* Sound Toggle */}
-          <button
+          <motion.button
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
             onClick={onToggleSound}
-            className={`apple-press-effect p-2.5 rounded-2xl transition-all border ${
+            aria-label={soundEnabled ? 'Wyłącz dźwięk kartkowania' : 'Włącz dźwięk kartkowania'}
+            className={`p-2.5 rounded-2xl transition-colors border ${
               soundEnabled 
-                ? 'bg-amber-500/20 border-amber-500/40 text-amber-400 shadow-inner' 
-                : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
+                ? 'bg-white/20 border-white/40 text-white shadow-inner' 
+                : 'bg-white/5 border-white/10 text-neutral-400 hover:text-white'
             }`}
             title={soundEnabled ? 'Efekt dźwiękowy kartkowania włączony' : 'Włącz dźwięk kartkowania'}
           >
             {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-          </button>
+          </motion.button>
 
           {/* Fullscreen Toggle */}
-          <button
+          <motion.button
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
             onClick={onToggleFullscreen}
-            className="apple-press-effect p-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-all border border-white/10 hidden sm:flex"
+            aria-label={isFullscreen ? 'Opuść tryb pełnoekranowy' : 'Włącz tryb pełnoekranowy'}
+            className="p-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white transition-colors border border-white/10 hidden sm:flex"
             title="Tryb pełnoekranowy"
           >
             {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
-          </button>
+          </motion.button>
+
 
           {/* Upload PDF */}
           <button
             onClick={onOpenUploadModal}
-            className="apple-press-effect flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-lg shadow-amber-500/25 ml-1"
+            className="apple-press-effect flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-white hover:bg-neutral-200 text-black font-bold text-xs shadow-md border border-white ml-1 transition-colors"
           >
             <Upload className="w-4 h-4" />
             <span className="hidden md:inline">Wczytaj PDF</span>
           </button>
         </div>
       </div>
+
+      {/* Reading Progress Line */}
+      {catalog && catalog.totalPages > 0 && (
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 overflow-hidden">
+          <motion.div
+            className="h-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.9)]"
+            initial={false}
+            animate={{ width: `${Math.min(100, Math.max(0, (currentPage / catalog.totalPages) * 100))}%` }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          />
+        </div>
+      )}
     </header>
   );
 };
